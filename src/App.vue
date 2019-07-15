@@ -1,21 +1,25 @@
 <template>
   <div id="app">
-    <div id="login">
-      <div id="description">
-        <h1>Login</h1>
-        <p>By logging in you agree to the ridiculously long terms that you didn't bother to read.</p>
+    <div class="login">
+      <div class="logo">
+        <img src="./assets/img/d-login.png" alt="">
+        <span>Login</span>
       </div>
-      <div id="form">
-        <form @submit.prevent="doLogin">
-          <label for="username">Username</label>
-          <input type="text" id="username" v-model="username" placeholder="username" autocomplete="off">
-
-          <label for="password">Password</label>&nbsp;
-          <i class="fas" :class="[passwordIcon]" @click="hidePassword = !hidePassword"></i>
-          <input type="password" id="password" v-model="password" placeholder="password">
-          <!--<el-button type="primary" @click="submitForm('ruleForm')">Log in</el-button>-->
-          <button type="submit">Log in</button>
-        </form>
+      <div class="login-input">
+        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" class="demo-ruleForm">
+          <el-form-item label="" prop="username">
+            <el-input v-model="ruleForm.username" clearable placeholder="Username"></el-input>
+          </el-form-item>
+          <el-form-item label="" prop="pass">
+            <el-input type="password" v-model="ruleForm.password" autocomplete="off" placeholder="Password" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="submitForm('ruleForm')">
+              <loading v-if="load"></loading>
+              <span v-else>Login</span>
+            </el-button>
+          </el-form-item>
+        </el-form>
       </div>
     </div>
   </div>
@@ -23,141 +27,111 @@
 
 <script>
 
+import loading from './components/loading'
+import { AccountLogin } from './api/login'
 export default {
-  name: 'app',
+  components: { loading },
   data () {
+    let checkUsername = (rule, value, callback) => {
+      if (!value || value.trim() === '') {
+        return callback(new Error('Username is required'))
+      }
+      callback()
+    }
+    let validatePass = (rule, value, callback) => {
+      if (!value || value.trim() === '') {
+        return callback(new Error('Password is required'))
+      }
+      callback()
+    }
     return {
+      load: false,
       ruleForm: {
-        pass: '',
-        checkPass: ''
+        password: '',
+        username: ''
+      },
+      rules: {
+        password: [
+          { validator: validatePass, trigger: 'blur' }
+        ],
+        username: [
+          { validator: checkUsername, trigger: 'blur' }
+        ]
       }
     }
   },
   methods: {
     submitForm (formName) {
-      console.log('submit!!')
+      this.load = true
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          AccountLogin({
+            username: this.ruleForm.username,
+            password: this.ruleForm.password
+          }).then(({ data }) => {
+            this.load = false
+            this.$message('Authentication is successful')
+          }).catch(() => {
+            this.load = false
+          })
+        } else {
+          console.log('error submit!')
+          return false
+        }
+      })
     }
   }
 }
 </script>
 
-<style>
-  * {
-    box-sizing: border-box;
-    font-family: 'Nunito', sans-serif;
-  }
-
-  html,
-  body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-  }
-
-  div#app {
+<style lang='scss'>
+  .login {
     width: 100%;
     height: 100%;
-  }
-
-  div#app div#login {
-    align-items: center;
-    background-color: #e2e2e5;
+    background: rgb(48, 49, 62);
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100%;
-  }
-
-  div#app div#login div#description {
-    background-color: #ffffff;
-    width: 25%;
-    height: 25%;
-    padding: 35px;
-  }
-
-  div#app div#login div#description h1,
-  div#app div#login div#description p {
-    margin: 0;
-  }
-
-  div#app div#login div#description p {
-    font-size: 0.8em;
-    color: #95a5a6;
-    margin-top: 10px;
-  }
-
-  div#app div#login div#form {
-    background-color: #34495e;
-    border-radius: 5px;
-    box-shadow: 0px 0px 30px 0px #666;
-    color: #ecf0f1;
-    width: 25%;
-    height: 35%;
-    padding: 35px;
-  }
-
-  div#app div#login div#form label,
-  div#app div#login div#form input {
-    outline: none;
-    width: 100%;
-  }
-
-  div#app div#login div#form label {
-    color: #95a5a6;
-    font-size: 0.8em;
-  }
-
-  div#app div#login div#form input {
-    background-color: transparent;
-    border: none;
-    color: #ecf0f1;
-    font-size: 1em;
-    margin-bottom: 20px;
-  }
-
-  div#app div#login div#form ::placeholder {
-    color: #ecf0f1;
-    opacity: 1;
-  }
-
-  div#app div#login div#form button {
-    background-color: #ffffff;
-    cursor: pointer;
-    border: none;
-    padding: 10px;
-    transition: background-color 0.2s ease-in-out;
-    width: 100%;
-  }
-
-  div#app div#login div#form button:hover {
-    background-color: #eeeeee;
-  }
-
-  @media screen and (max-width: 600px) {
-    div#app div#login {
-      align-items: unset;
-      background-color: unset;
-      display: unset;
-      justify-content: unset;
+    color: #fff;
+    .logo {
+      color: rgb(3, 174, 189);
+      font-size: 30px;
+      // font-style: italic;
+      font-weight: bold;
+      margin-bottom: 20px;
+      img {
+        width: 74px;
+        vertical-align: middle;
+        margin-right: 10px;
+      }
     }
+    .login-input {
+      width: 290px;
+      padding: 10px;
+      margin-top: 10px;
+      .el-input {
+        // margin-bottom: 20px;
+        .el-input__inner {
+          border-radius: 30px !important;
+          text-align: center;
+        }
+      }
+      .el-button {
+        border-radius: 30px !important;
+        width: 270px;
+        background: rgb(3, 174, 189);
+        color: #fff;
+        border: 0;
+      }
+      .register {
+        text-align: right;
+        margin: 10px;
+        a {
+          color: #fff
+        }
+      }
 
-    div#app div#login div#description {
-      margin: 0 auto;
-      max-width: 25%;
-      width: 100%;
-    }
-
-    div#app div#login div#form {
-      border-radius: unset;
-      box-shadow: unset;
-      width: 100%;
-    }
-
-    div#app div#login div#form form {
-      margin: 0 auto;
-      max-width: 25%;
-      width: 100%;
     }
   }
 </style>
