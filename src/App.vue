@@ -10,7 +10,7 @@
           <el-form-item label="" prop="username">
             <el-input v-model="ruleForm.username" clearable placeholder="Username"></el-input>
           </el-form-item>
-          <el-form-item label="" prop="pass">
+          <el-form-item label="" prop="password">
             <el-input type="password" v-model="ruleForm.password" autocomplete="off" placeholder="Password" clearable></el-input>
           </el-form-item>
           <el-form-item>
@@ -70,12 +70,21 @@ export default {
             password: this.ruleForm.password
           }).then(({ data }) => {
             this.load = false
-            this.$message('Authentication is successful')
+            this.$message({
+              message: 'Authentication is successful',
+              type: 'success',
+              duration: 5 * 1000
+            })
           }).catch(() => {
             this.load = false
           })
         } else {
-          console.log('error submit!')
+          this.load = false
+          this.$message({
+            message: 'Error Submit!!',
+            type: 'error',
+            duration: 5 * 1000
+          })
           return false
         }
       })
