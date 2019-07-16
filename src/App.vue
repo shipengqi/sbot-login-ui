@@ -71,9 +71,12 @@ export default {
           }).then(({ data }) => {
             this.load = false
             this.$message({
-              message: 'Authentication is successful',
+              message: 'Authentication is successful, the browser window will close automatically after 5 seconds.',
               type: 'success',
               duration: 5 * 1000
+            })
+            setTimeout(() => {
+              window.close()
             })
           }).catch(() => {
             this.load = false
