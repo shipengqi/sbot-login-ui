@@ -77,7 +77,7 @@ export default {
             })
             setTimeout(() => {
               window.close()
-            })
+            }, 5000)
           }).catch(() => {
             this.load = false
           })
