@@ -40,12 +40,15 @@ service.interceptors.response.use(
       switch (code) {
         case 0:
           // code === 0 代表没有错误
-          return dataAxios.data
+          return dataAxios
         case 200:
           // code === 200 代表没有错误
-          return dataAxios.data
+          return dataAxios
         case 201:
-          return dataAxios.data
+          return dataAxios
+        case 400:
+          errorLog(`${dataAxios.msg}: ${response.config.url}`)
+          break
         default:
           // 不是正确的 code
           errorLog(`${dataAxios.msg}: ${response.config.url}`)

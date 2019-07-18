@@ -76,7 +76,7 @@ export default {
               cancelButtonText: 'no'
             }).then(() => {
               window.close()
-            })
+            }).catch(() => {})
           }).catch(() => {
             this.load = false
           })
