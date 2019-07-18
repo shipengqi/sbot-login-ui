@@ -70,14 +70,13 @@ export default {
             password: this.ruleForm.password
           }).then(({ data }) => {
             this.load = false
-            this.$message({
-              message: 'Authentication is successful, the browser window will close automatically after 5 seconds.',
+            this.$confirm('Sign in was successful, do you want to close the browser window?', 'Sign in success', {
               type: 'success',
-              duration: 5 * 1000
-            })
-            setTimeout(() => {
+              confirmButtonText: 'yes',
+              cancelButtonText: 'no'
+            }).then(() => {
               window.close()
-            }, 5000)
+            })
           }).catch(() => {
             this.load = false
           })
